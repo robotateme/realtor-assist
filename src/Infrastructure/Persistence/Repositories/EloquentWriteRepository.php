@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Infrastructure\Persistence\Repositories;
 
 use Application\Port\Persistence\WriteRepositoryPort;
@@ -9,22 +11,20 @@ use Override;
 
 final class EloquentWriteRepository implements WriteRepositoryPort
 {
-    /**
-     * @param class-string<Model> $modelClass
-     */
     public function __construct(
         private readonly Container $container,
-        private readonly string $modelClass,
     ) {
     }
 
     /**
+     * @param class-string<Model> $modelClass
      * @param array<string, mixed> $attributes
      */
     #[Override]
-    public function create(array $attributes): Model
+    public function create(string $modelClass, array $attributes): Model
     {
-        $model = $this->newModel();
+        /** @var Model $model */
+        $model = $this->container->make($modelClass);
         $model->fill($attributes);
         $model->save();
 
@@ -53,13 +53,5 @@ final class EloquentWriteRepository implements WriteRepositoryPort
     public function delete(Model $model): bool
     {
         return (bool) $model->delete();
-    }
-
-    private function newModel(): Model
-    {
-        /** @var Model $model */
-        $model = $this->container->make($this->modelClass);
-
-        return $model;
     }
 }

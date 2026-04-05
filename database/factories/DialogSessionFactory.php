@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Client;
@@ -29,6 +31,7 @@ final class DialogSessionFactory extends Factory
             'context_data' => [
                 'source' => fake()->randomElement(['telegram', 'site', 'whatsapp']),
                 'step' => fake()->randomElement(['greeting', 'qualification', 'selection']),
+                'budget' => fake()->randomElement(['<100k', '100k-300k', '300k-700k', '700k+']),
             ],
             'last_message' => fake()->optional()->sentence(),
         ];

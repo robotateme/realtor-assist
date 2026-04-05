@@ -14,16 +14,12 @@
         <directory name="src" />
         <directory name="tests" />
         <ignoreFiles>
+            <file name="app/Console/Commands/Testing.php" />
             <file name="routes/console.php" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <MissingOverrideAttribute>
-            <errorLevel type="suppress">
-                <file name="app/Providers/AppServiceProvider.php" />
-            </errorLevel>
-        </MissingOverrideAttribute>
         <UndefinedMagicMethod>
             <errorLevel type="suppress">
                 <directory name="database/migrations" />

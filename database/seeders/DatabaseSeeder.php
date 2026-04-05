@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\User;
@@ -15,11 +17,18 @@ final class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Agency Owner',
+            'email' => 'owner@realtor-assist.test',
+        ]);
+
+        User::factory()->count(4)->create();
+
+        $this->call([
+            ClientSeeder::class,
+            PropertySeeder::class,
+            ViewingSeeder::class,
+            DialogSessionSeeder::class,
         ]);
     }
 }

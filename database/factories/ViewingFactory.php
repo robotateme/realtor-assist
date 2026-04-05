@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Client;
@@ -27,7 +29,7 @@ final class ViewingFactory extends Factory
         return [
             'client_id' => Client::factory(),
             'property_id' => Property::factory(),
-            'scheduled_at' => fake()->dateTimeBetween('+1 day', '+1 month'),
+            'scheduled_at' => fake()->dateTimeBetween('-3 days', '+3 weeks'),
             'status' => fake()->numberBetween(0, 2),
         ];
     }

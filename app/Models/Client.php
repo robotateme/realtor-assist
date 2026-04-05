@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\ClientFactory;
-use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Model;
+use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
 
 /**
  * @property int $id
@@ -32,16 +34,19 @@ final class Client extends Model
     use HasFactory;
     use InteractsWithRelations;
 
+    /** @return BelongsTo<User,$this> */
     public function user(): BelongsTo
     {
         return $this->relationsPort()->belongsTo($this, User::class);
     }
 
+    /** @return HasMany<Viewing,$this> */
     public function viewings(): HasMany
     {
         return $this->relationsPort()->hasMany($this, Viewing::class);
     }
 
+    /** @return HasOne<DialogSession,$this> */
     public function dialogSession(): HasOne
     {
         return $this->relationsPort()->hasOne($this, DialogSession::class);

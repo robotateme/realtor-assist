@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\PropertyFactory;
 use Domain\Property\TypesEnum;
-use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
-use Override;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
+use Override;
 
 /**
  * @property int $id
@@ -41,6 +43,7 @@ final class Property extends Model
         ];
     }
 
+    /** @return HasMany<Viewing,$this> */
     public function viewings(): HasMany
     {
         return $this->relationsPort()->hasMany($this, Viewing::class);

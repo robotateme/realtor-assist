@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\ViewingFactory;
-use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
-use Override;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
+use Override;
 
 /**
  * @property int $id
@@ -39,11 +41,13 @@ final class Viewing extends Model
         ];
     }
 
+    /** @return BelongsTo<Client,$this> */
     public function client(): BelongsTo
     {
         return $this->relationsPort()->belongsTo($this, Client::class);
     }
 
+    /** @return BelongsTo<Property,$this> */
     public function property(): BelongsTo
     {
         return $this->relationsPort()->belongsTo($this, Property::class);

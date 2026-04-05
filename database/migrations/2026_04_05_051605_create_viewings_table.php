@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Client;
 use App\Models\Property;
 use Illuminate\Database\Schema\Blueprint;
 use Infrastructure\Persistence\Migrations\InfrastructureMigration;
 
-return new class extends InfrastructureMigration
-{
+return new class () extends InfrastructureMigration {
     /**
      * Run the migrations.
      */

@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Property;
 
-enum TypesEnum: string {
+enum TypesEnum: string
+{
     case APARTMENT = 'apartment';
     case HOUSE = 'house';
     case TOWNHOUSE = 'townhouse';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Property;
@@ -24,7 +26,13 @@ final class PropertyFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->sentence(3),
+            'title' => fake()->randomElement([
+                'Cozy Downtown Apartment',
+                'Modern Family House',
+                'Spacious Office Loft',
+                'Retail Corner Space',
+                'Investment Land Parcel',
+            ]),
             'location' => fake()->city(),
             'price' => fake()->numberBetween(50_000, 5_000_000),
             'type' => fake()->randomElement(TypesEnum::cases()),

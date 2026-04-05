@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Client;
@@ -26,7 +28,7 @@ final class ClientFactory extends Factory
         return [
             'full_name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'phone' => fake()->optional()->phoneNumber(),
+            'phone' => fake()->optional()->numerify('+1##########'),
             'user_id' => User::factory(),
         ];
     }

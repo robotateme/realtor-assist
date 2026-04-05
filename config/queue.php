@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -13,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'database'),
+    'default' => env('QUEUE_CONNECTION', 'redis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -69,7 +71,25 @@ return [
             'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
             'queue' => env('REDIS_QUEUE', 'default'),
             'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 90),
-            'block_for' => null,
+            'block_for' => (int) env('REDIS_QUEUE_BLOCK_FOR', 0),
+            'after_commit' => false,
+        ],
+
+        'redis_llm' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => env('REDIS_QUEUE_LLM', 'llm'),
+            'retry_after' => (int) env('REDIS_QUEUE_LLM_RETRY_AFTER', (int) env('REDIS_QUEUE_RETRY_AFTER', 300)),
+            'block_for' => (int) env('REDIS_QUEUE_LLM_BLOCK_FOR', env('REDIS_QUEUE_BLOCK_FOR', 5)),
+            'after_commit' => false,
+        ],
+
+        'redis_webhook' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => env('REDIS_QUEUE_WEBHOOK', 'webhook'),
+            'retry_after' => (int) env('REDIS_QUEUE_WEBHOOK_RETRY_AFTER', (int) env('REDIS_QUEUE_RETRY_AFTER', 90)),
+            'block_for' => (int) env('REDIS_QUEUE_WEBHOOK_BLOCK_FOR', env('REDIS_QUEUE_BLOCK_FOR', 5)),
             'after_commit' => false,
         ],
 

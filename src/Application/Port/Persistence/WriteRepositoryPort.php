@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Application\Port\Persistence;
 
 use Illuminate\Database\Eloquent\Model;
@@ -7,9 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 interface WriteRepositoryPort
 {
     /**
+     * @param class-string<Model> $modelClass
      * @param array<string, mixed> $attributes
      */
-    public function create(array $attributes): Model;
+    public function create(string $modelClass, array $attributes): Model;
 
     /**
      * @param array<string, mixed> $attributes

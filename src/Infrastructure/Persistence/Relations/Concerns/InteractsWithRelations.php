@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Infrastructure\Persistence\Relations\Concerns;
 
-use Application\Port\Persistence\RelationsPort;
+use Application\Port\Persistence\RelationsPortInterface;
 
 trait InteractsWithRelations
 {
-    protected function relationsPort(): RelationsPort
+    protected function relationsPort(): RelationsPortInterface
     {
-        /** @var RelationsPort $relations */
-        $relations = app(RelationsPort::class);
+        /** @var RelationsPortInterface $relations */
+        $relations = app(RelationsPortInterface::class);
 
         return $relations;
     }

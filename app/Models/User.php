@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
-use Override;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
+use Override;
 
 /**
  * @property int $id
@@ -31,7 +33,8 @@ use Illuminate\Notifications\Notifiable;
 final class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
     use InteractsWithRelations;
 
     /**
@@ -48,6 +51,7 @@ final class User extends Authenticatable
         ];
     }
 
+    /** @return HasMany<Client,$this> */
     public function clients(): HasMany
     {
         return $this->relationsPort()->hasMany($this, Client::class);
