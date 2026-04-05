@@ -1,22 +1,21 @@
 <?php
 
 use App\Models\Client;
-use App\Models\Viewing;
-use Illuminate\Database\Migrations\Migration;
+use App\Models\Property;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Infrastructure\Persistence\Migrations\InfrastructureMigration;
 
-return new class extends Migration
+return new class extends InfrastructureMigration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('viewings', static function (Blueprint $table) {
+        $this->schema()->create('viewings', static function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Client::class);
-            $table->foreignIdFor(Viewing::class);
+            $table->foreignIdFor(Client::class)->constrained();
+            $table->foreignIdFor(Property::class)->constrained();
             $table->dateTime('scheduled_at');
             $table->tinyInteger('status')->default(0);
             $table->timestamps();
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('viewings');
+        $this->schema()->dropIfExists('viewings');
     }
 };

@@ -1,19 +1,19 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use App\Models\Client;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Infrastructure\Persistence\Migrations\InfrastructureMigration;
 
-return new class extends Migration
+return new class extends InfrastructureMigration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('dialog_sessions', function (Blueprint $table) {
+        $this->schema()->create('dialog_sessions', function (Blueprint $table) {
             $table->id();
-            $table->integer('client_id');
+            $table->foreignIdFor(Client::class)->constrained();
             $table->integer('current_intent');
             $table->json('context_data')->nullable();
             $table->text('last_message')->nullable();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dialog_sessions');
+        $this->schema()->dropIfExists('dialog_sessions');
     }
 };

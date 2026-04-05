@@ -6,12 +6,16 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Override;
 
 /**
  * @extends Factory<User>
  */
-class UserFactory extends Factory
+final class UserFactory extends Factory
 {
+    /** @var class-string<User> */
+    protected $model = User::class;
+
     /**
      * The current password being used by the factory.
      */
@@ -22,6 +26,7 @@ class UserFactory extends Factory
      *
      * @return array<string, mixed>
      */
+    #[Override]
     public function definition(): array
     {
         return [
@@ -38,7 +43,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn () => [
             'email_verified_at' => null,
         ]);
     }

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="8"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="false"
+>
+    <projectFiles>
+        <directory name="app" />
+        <directory name="database" />
+        <directory name="src" />
+        <directory name="tests" />
+        <ignoreFiles>
+            <file name="routes/console.php" />
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+    <issueHandlers>
+        <MissingOverrideAttribute>
+            <errorLevel type="suppress">
+                <file name="app/Providers/AppServiceProvider.php" />
+            </errorLevel>
+        </MissingOverrideAttribute>
+        <UndefinedMagicMethod>
+            <errorLevel type="suppress">
+                <directory name="database/migrations" />
+            </errorLevel>
+        </UndefinedMagicMethod>
+        <PropertyNotSetInConstructor>
+            <errorLevel type="suppress">
+                <directory name="tests" />
+            </errorLevel>
+        </PropertyNotSetInConstructor>
+    </issueHandlers>
+</psalm>
