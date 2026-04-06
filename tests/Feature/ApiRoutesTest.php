@@ -18,11 +18,11 @@ final class ApiRoutesTest extends TestCase
         self::assertContains('GET', $route->methods());
     }
 
-    public function test_telegram_webhook_debug_route_is_registered(): void
+    public function test_telegram_webhook_route_is_registered(): void
     {
-        $route = Route::getRoutes()->match(Request::create('/api/v1/webhooks/telegram/debug', 'GET'));
+        $route = Route::getRoutes()->match(Request::create('/api/v1/webhooks/telegram/test-token', 'POST'));
 
-        self::assertSame('api/v1/webhooks/telegram/debug', $route->uri());
-        self::assertContains('GET', $route->methods());
+        self::assertSame('api/v1/webhooks/telegram/{token}', $route->uri());
+        self::assertContains('POST', $route->methods());
     }
 }

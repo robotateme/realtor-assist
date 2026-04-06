@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 use Infrastructure\Persistence\Repositories\EloquentFilterContext;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery\Expectation;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -137,11 +136,8 @@ final class EloquentFilterContextTest extends TestCase
     /**
      * @param Builder<Model>&MockInterface $builder
      */
-    private function expect(Builder $builder, string $method): Expectation
+    private function expect(Builder $builder, string $method): mixed
     {
-        /** @var Expectation $expectation */
-        $expectation = $builder->shouldReceive($method);
-
-        return $expectation;
+        return $builder->shouldReceive($method);
     }
 }

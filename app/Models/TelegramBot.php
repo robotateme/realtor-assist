@@ -11,4 +11,5 @@ use DefStudio\Telegraph\Models\TelegraphBot as BaseTelegraphBot;
  */
 final class TelegramBot extends BaseTelegraphBot
 {
+    protected $table = 'telegraph_bots';
 }
