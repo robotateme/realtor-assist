@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Domain\MessengerClient;
 
 use Domain\MessengerClient\VO\MessengerId;
+use Domain\Shared\DomainException;
 
 final readonly class MessengerClient
 {
+    /**
+     * @throws DomainException
+     */
     public function __construct(
         private MessengerProviderEnum $provider,
         private string $username,
@@ -17,6 +21,9 @@ final readonly class MessengerClient
         private MessengerId $messengerId,
         private bool $isBot,
     ) {
+        if ($messengerId->getProvider() !== $provider) {
+            throw new DomainException('Messenger provider does not match messenger id provider');
+        }
     }
 
     public function getProvider(): MessengerProviderEnum

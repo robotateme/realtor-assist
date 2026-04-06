@@ -35,13 +35,10 @@ final class Client extends Model
     use InteractsWithRelations;
 
     protected $fillable = [
-        'client_id',
-        'name',
+        'full_name',
         'email',
         'phone',
         'user_id',
-        'full_name',
-        'id',
     ];
 
     /** @return BelongsTo<User,$this> */

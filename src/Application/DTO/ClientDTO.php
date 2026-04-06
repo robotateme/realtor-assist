@@ -8,19 +8,12 @@ use Domain\Client\VO\ClientEmail;
 
 class ClientDTO
 {
-    /**
-     * @param string|null $fullName
-     * @param ClientEmail|null $email
-     * @param string|null $phone
-     * @param null|int $userId
-     * @param int|null $id
-     */
     public function __construct(
-        public ?string      $fullName,
-        public ?ClientEmail $email,
+        public string       $fullName,
+        public ClientEmail  $email,
         public ?string      $phone,
-        public ?int        $userId = null,
-        public ?int        $id = null,
+        public ?int         $userId = null,
+        public ?int         $id = null,
     ) {
     }
 }

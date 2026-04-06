@@ -21,15 +21,4 @@ final class ClientDTOTest extends TestCase
         self::assertSame(7, $dto->userId);
         self::assertSame(11, $dto->id);
     }
-
-    public function test_it_allows_nullable_fields(): void
-    {
-        $dto = new ClientDTO(null, null, null);
-
-        self::assertNull($dto->fullName);
-        self::assertNull($dto->email);
-        self::assertNull($dto->phone);
-        self::assertNull($dto->userId);
-        self::assertNull($dto->id);
-    }
 }
