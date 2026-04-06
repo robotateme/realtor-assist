@@ -27,7 +27,7 @@ final class DomainEventsTest extends TestCase
             ClientRegisteredDomainEvent::class,
             static function (ClientRegisteredDomainEvent $event) use (&$handledEvents): void {
                 $handledEvents[] = $event->clientId;
-            }
+            },
         );
 
         DomainEvents::dispatch(new ClientRegisteredDomainEvent(

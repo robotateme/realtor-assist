@@ -94,9 +94,9 @@ return [
         array_filter(
             array_map(
                 static fn (string $email): string => trim($email),
-                explode(',', (string) env('HORIZON_ALLOWED_EMAILS', ''))
-            )
-        )
+                explode(',', (string) env('HORIZON_ALLOWED_EMAILS', '')),
+            ),
+        ),
     ),
 
     /*

@@ -11,6 +11,7 @@ $finder = PhpCsFixer\Finder::create()
         __DIR__ . '/tests',
     ])
     ->name('*.php')
+    ->notPath('app/Console/Commands/Testing.php')
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);
 
@@ -22,13 +23,18 @@ return (new PhpCsFixer\Config())
         'binary_operator_spaces' => [
             'default' => 'single_space',
         ],
-        'blank_line_after_opening_tag' => true,
+        'cast_spaces' => [
+            'space' => 'single',
+        ],
         'concat_space' => [
             'spacing' => 'one',
         ],
         'declare_strict_types' => false,
         'no_extra_blank_lines' => true,
         'no_unused_imports' => true,
+        'new_with_parentheses' => [
+            'anonymous_class' => false,
+        ],
         'ordered_imports' => [
             'sort_algorithm' => 'alpha',
         ],

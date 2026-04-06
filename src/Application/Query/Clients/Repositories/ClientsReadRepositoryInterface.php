@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Infrastructure\Persistence\Repositories;
+namespace Application\Query\Clients\Repositories;
 
 use Application\Criteria\Persistence\Criteria;
 use Application\Port\Persistence\ReadRepositoryInterface;
 use Domain\Client\ClientEntity;
 use Override;
 
+/**
+ *
+ */
 interface ClientsReadRepositoryInterface extends ReadRepositoryInterface
 {
     /**
@@ -18,8 +21,8 @@ interface ClientsReadRepositoryInterface extends ReadRepositoryInterface
     public function all(Criteria $criteria): iterable;
 
     #[Override]
-    public function findById(int|string $id): ?ClientEntity;
+    public function findById(int|string $id): ClientEntity;
 
     #[Override]
-    public function findOneBy(Criteria $criteria): ?ClientEntity;
+    public function findOneBy(Criteria $criteria): ClientEntity;
 }

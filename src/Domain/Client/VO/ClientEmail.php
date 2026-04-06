@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Client\VO;
 
+use Domain\Shared\DomainException;
 use Exception;
 use Override;
 use Webmozart\Assert\Assert;
-use Domain\Shared\DomainException;
 
 final class ClientEmail
 {

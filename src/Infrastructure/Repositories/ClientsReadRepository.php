@@ -6,13 +6,18 @@ namespace Infrastructure\Repositories;
 
 use App\Models\Client;
 use Application\Criteria\Persistence\Criteria;
+use Application\Query\Clients\Repositories\ClientsReadRepositoryInterface;
 use Domain\Client\ClientEntity;
 use Domain\Shared\DomainException;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Infrastructure\Mappings\Clients\GetClients;
-use Infrastructure\Persistence\Repositories\ClientsReadRepositoryInterface;
 use Infrastructure\Persistence\Repositories\EloquentFilterContext;
 use Override;
 
+/**
+ *
+ */
 final readonly class ClientsReadRepository implements ClientsReadRepositoryInterface
 {
     public function __construct(
@@ -27,10 +32,10 @@ final readonly class ClientsReadRepository implements ClientsReadRepositoryInter
     #[Override]
     public function all(Criteria $criteria): iterable
     {
-        /** @var \Illuminate\Database\Eloquent\Builder<Client> $builder */
+        /** @var Builder<Client> $builder */
         $builder = $this->filterContext->apply(Client::query(), $criteria);
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, Client> $clients */
+        /** @var Collection<int, Client> $clients */
         $clients = $builder->get();
 
         return $clients
@@ -40,32 +45,37 @@ final readonly class ClientsReadRepository implements ClientsReadRepositoryInter
 
     /**
      * @param int|string $id
-     * @return ClientEntity|null
      * @throws DomainException
      */
     #[Override]
-    public function findById(int|string $id): ?ClientEntity
+    public function findById(int|string $id): ClientEntity
     {
         /** @var Client|null $client */
         $client = Client::query()->find($id);
 
-        return $client instanceof Client ? $this->mapper->fromModel($client) : null;
+        if (is_null($client)) {
+            throw new DomainException('Client not found');
+        }
+
+        return $this->mapper->fromModel($client);
     }
 
     /**
      * @param Criteria $criteria
-     * @return ClientEntity|null
      * @throws DomainException
      */
     #[Override]
-    public function findOneBy(Criteria $criteria): ?ClientEntity
+    public function findOneBy(Criteria $criteria): ClientEntity
     {
-        /** @var \Illuminate\Database\Eloquent\Builder<Client> $builder */
+        /** @var Builder<Client> $builder */
         $builder = $this->filterContext->apply(Client::query(), $criteria);
 
         /** @var Client|null $client */
         $client = $builder->first();
+        if (is_null($client)) {
+            throw new DomainException('Client not found');
+        }
 
-        return $client instanceof Client ? $this->mapper->fromModel($client) : null;
+        return $this->mapper->fromModel($client);
     }
 }

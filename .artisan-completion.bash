@@ -1,8 +1,8 @@
 # shellcheck shell=bash
 
-if command -v php >/dev/null 2>&1 && [ -f /home/oem/Work/realtor-assist/artisan ]; then
+if command -v php >/dev/null 2>&1 && [ -f /var/www/html/artisan ]; then
     eval "$(
-        cd /home/oem/Work/realtor-assist &&
+        cd /var/www/html &&
         command php artisan completion bash
     )"
 fi

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Infrastructure\Persistence\Repositories;
 
 use Application\Criteria\Persistence\Criteria;

@@ -7,6 +7,9 @@ namespace Infrastructure\Persistence\Migrations;
 use Application\Port\Persistence\MigrationsPortInterface;
 use Illuminate\Database\Migrations\Migration;
 
+/**
+ *
+ */
 abstract class InfrastructureMigration extends Migration
 {
     final protected function schema(): MigrationsPortInterface

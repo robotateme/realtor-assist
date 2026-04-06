@@ -9,7 +9,7 @@ use Closure;
 use Illuminate\Support\Facades\Schema;
 use Override;
 
-final class LaravelMigrationsAdapterInterface implements MigrationsPortInterface
+final class LaravelMigrationsAdapter implements MigrationsPortInterface
 {
     #[Override]
     public function create(string $table, Closure $callback): void

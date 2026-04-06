@@ -18,6 +18,7 @@
         "webmozart/assert": "^2.1"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.7",
         "fakerphp/faker": "^1.23",
         "friendsofphp/php-cs-fixer": "^3.74",
         "larastan/larastan": "^3.9",
@@ -61,6 +62,11 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "ide-helper": [
+            "@php artisan ide-helper:generate --ansi",
+            "@php artisan ide-helper:models --nowrite --reset --ansi",
+            "@php artisan ide-helper:meta --ansi"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

@@ -6,7 +6,7 @@ use Domain\Property\TypesEnum;
 use Illuminate\Database\Schema\Blueprint;
 use Infrastructure\Persistence\Migrations\InfrastructureMigration;
 
-return new class () extends InfrastructureMigration {
+return new class extends InfrastructureMigration {
     /**
      * Run the migrations.
      */

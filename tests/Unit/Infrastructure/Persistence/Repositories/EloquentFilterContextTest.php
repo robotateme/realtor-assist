@@ -11,9 +11,9 @@ use Application\Criteria\Persistence\Order;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Infrastructure\Persistence\Repositories\EloquentFilterContext;
-use Mockery\Expectation;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery\Expectation;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 

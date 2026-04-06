@@ -106,9 +106,9 @@ return [
         array_filter(
             array_map(
                 static fn (string $email): string => trim($email),
-                explode(',', (string) env('TELESCOPE_ALLOWED_EMAILS', ''))
-            )
-        )
+                explode(',', (string) env('TELESCOPE_ALLOWED_EMAILS', '')),
+            ),
+        ),
     ),
 
     /*

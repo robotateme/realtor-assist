@@ -1,25 +1,60 @@
 #!/usr/bin/env bash
 
-if [ "$SUPERVISOR_PHP_USER" != "root" ] && [ "$SUPERVISOR_PHP_USER" != "sail" ]; then
+set -e
+umask 0000
+
+if [ "${SUPERVISOR_PHP_USER}" != "root" ] && [ "${SUPERVISOR_PHP_USER}" != "sail" ]; then
     echo "You should set SUPERVISOR_PHP_USER to either 'sail' or 'root'."
     exit 1
 fi
 
-if [ ! -z "$WWWUSER" ]; then
-    usermod -u $WWWUSER sail
-fi
+composer_home="${COMPOSER_HOME:-/home/sail/.composer}"
+home_dir="${HOME:-/home/sail}"
 
-if [ ! -d /.composer ]; then
-    mkdir /.composer
-fi
+mkdir -p "$composer_home"
+mkdir -p /var/www/html/bootstrap/cache
+mkdir -p /var/www/html/storage/framework/cache/data
+mkdir -p /var/www/html/storage/framework/sessions
+mkdir -p /var/www/html/storage/framework/views
+mkdir -p /var/www/html/storage/logs
 
-chmod -R ugo+rw /.composer
+# Bind-mounted files may be owned by the host with a different numeric UID/GID.
+# Don't make startup fatal on chmod/chgrp attempts for those paths.
+chmod -R ug+rwX "$composer_home" 2>/dev/null || true
+for path in /var/www/html/bootstrap/cache /var/www/html/storage; do
+    chmod ug+rwX "$path" 2>/dev/null || true
+done
+find /var/www/html/bootstrap/cache /var/www/html/storage -type d -writable -exec chmod g+s {} + 2>/dev/null || true
+
+bash_completion_line='[ -f /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion'
+umask_line='umask 0000'
+php_wrapper_line="php() { umask 0000; command php \"\$@\"; }"
+completion_line='[ -f /var/www/html/.artisan-completion.bash ] && . /var/www/html/.artisan-completion.bash'
+for bashrc in "$home_dir/.bashrc"; do
+    touch "$bashrc"
+
+    if ! grep -Fqx "$umask_line" "$bashrc"; then
+        printf '\n%s\n' "$umask_line" >> "$bashrc"
+    fi
+
+    if ! grep -Fqx "$php_wrapper_line" "$bashrc"; then
+        printf '%s\n' "$php_wrapper_line" >> "$bashrc"
+    fi
+
+    if ! grep -Fqx "$bash_completion_line" "$bashrc"; then
+        printf '\n%s\n' "$bash_completion_line" >> "$bashrc"
+    fi
+
+    if ! grep -Fqx "$completion_line" "$bashrc"; then
+        printf '\n%s\n' "$completion_line" >> "$bashrc"
+    fi
+done
 
 if [ $# -gt 0 ]; then
-    if [ "$SUPERVISOR_PHP_USER" = "root" ]; then
+    if [ "${SUPERVISOR_PHP_USER}" = "root" ]; then
         exec "$@"
     else
-        exec gosu $WWWUSER "$@"
+        exec "$@"
     fi
 else
     exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

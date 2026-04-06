@@ -34,6 +34,16 @@ final class Client extends Model
     use HasFactory;
     use InteractsWithRelations;
 
+    protected $fillable = [
+        'client_id',
+        'name',
+        'email',
+        'phone',
+        'user_id',
+        'full_name',
+        'id',
+    ];
+
     /** @return BelongsTo<User,$this> */
     public function user(): BelongsTo
     {

@@ -7,6 +7,9 @@ namespace Application\Port\Persistence;
 use Application\Criteria\Persistence\Criteria;
 use Domain\Client\ClientEntity;
 
+/**
+ *
+ */
 interface ReadRepositoryInterface
 {
     /**
@@ -14,7 +17,7 @@ interface ReadRepositoryInterface
      */
     public function all(Criteria $criteria): iterable;
 
-    public function findById(int|string $id): ?ClientEntity;
+    public function findById(int|string $id): ClientEntity;
 
-    public function findOneBy(Criteria $criteria): ?ClientEntity;
+    public function findOneBy(Criteria $criteria): ClientEntity;
 }

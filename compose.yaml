@@ -4,8 +4,10 @@ services:
             context: ./docker/8.5
             dockerfile: Dockerfile
             args:
+                WWWUSER: '${WWWUSER}'
                 WWWGROUP: '${WWWGROUP}'
         image: sail-8.5/app
+        user: '${WWWUSER}:${WWWGROUP}'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -13,6 +15,7 @@ services:
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
             WWWUSER: '${WWWUSER}'
+            WWWGROUP: '${WWWGROUP}'
             LARAVEL_SAIL: 1
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
@@ -29,13 +32,16 @@ services:
             context: ./docker/8.5
             dockerfile: Dockerfile
             args:
+                WWWUSER: '${WWWUSER:-1000}'
                 WWWGROUP: '${WWWGROUP:-1000}'
         image: sail-8.5/app
+        user: '${WWWUSER:-1000}:${WWWGROUP:-1000}'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         command: php artisan horizon
         environment:
             WWWUSER: '${WWWUSER:-1000}'
+            WWWGROUP: '${WWWGROUP:-1000}'
             LARAVEL_SAIL: 1
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
