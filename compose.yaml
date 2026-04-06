@@ -17,6 +17,8 @@ services:
             WWWUSER: '${WWWUSER}'
             WWWGROUP: '${WWWGROUP}'
             LARAVEL_SAIL: 1
+            VAR_DUMPER_FORMAT: '${VAR_DUMPER_FORMAT:-server}'
+            VAR_DUMPER_SERVER: '${VAR_DUMPER_SERVER:-tcp://dump-server:9912}'
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
@@ -43,6 +45,8 @@ services:
             WWWUSER: '${WWWUSER:-1000}'
             WWWGROUP: '${WWWGROUP:-1000}'
             LARAVEL_SAIL: 1
+            VAR_DUMPER_FORMAT: '${VAR_DUMPER_FORMAT:-server}'
+            VAR_DUMPER_SERVER: '${VAR_DUMPER_SERVER:-tcp://dump-server:9912}'
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
@@ -53,6 +57,26 @@ services:
         depends_on:
             - pgsql
             - redis
+    dump-server:
+        build:
+            context: ./docker/8.5
+            dockerfile: Dockerfile
+            args:
+                WWWUSER: '${WWWUSER:-1000}'
+                WWWGROUP: '${WWWGROUP:-1000}'
+        image: sail-8.5/app
+        user: '${WWWUSER:-1000}:${WWWGROUP:-1000}'
+        command: php vendor/bin/var-dump-server --host=0.0.0.0:9912
+        environment:
+            WWWUSER: '${WWWUSER:-1000}'
+            WWWGROUP: '${WWWGROUP:-1000}'
+            LARAVEL_SAIL: 1
+        ports:
+            - '${FORWARD_DUMP_SERVER_PORT:-9912}:9912'
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
     pgsql:
         image: 'postgres:18-alpine'
         ports:

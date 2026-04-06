@@ -23,6 +23,7 @@ return (new PhpCsFixer\Config())
         'binary_operator_spaces' => [
             'default' => 'single_space',
         ],
+        'blank_line_after_opening_tag' => false,
         'cast_spaces' => [
             'space' => 'single',
         ],

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Application\Query\Clients\Repositories;
+namespace Application\Command\Repositories\DB;
 
 use Application\DTO\ClientDTO;
 use Domain\Client\ClientEntity;

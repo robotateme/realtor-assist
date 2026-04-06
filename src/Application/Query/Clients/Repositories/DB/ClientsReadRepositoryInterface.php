@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Application\Query\Clients\Repositories;
+namespace Application\Query\Clients\Repositories\DB;
 
 use Application\Criteria\Persistence\Criteria;
 use Application\Port\Persistence\ReadRepositoryInterface;

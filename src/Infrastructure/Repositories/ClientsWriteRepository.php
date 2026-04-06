@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Infrastructure\Repositories;
 
 use App\Models\Client;
+use Application\Command\Repositories\DB\ClientsWriteRepositoryInterface;
 use Application\DTO\ClientDTO;
-use Application\Query\Clients\Repositories\ClientsWriteRepositoryInterface;
 use Domain\Client\ClientEntity;
 use Domain\Shared\DomainException;
 use Illuminate\Database\UniqueConstraintViolationException;

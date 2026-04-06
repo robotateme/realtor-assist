@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Application\Command\Repositories\DB\ClientsWriteRepositoryInterface;
 use Application\DTO\ClientDTO;
-use Application\Query\Clients\Repositories\ClientsReadRepositoryInterface;
-use Application\Query\Clients\Repositories\ClientsWriteRepositoryInterface;
+use Application\Query\Clients\Repositories\DB\ClientsReadRepositoryInterface;
 use Domain\Client\VO\ClientEmail;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;

@@ -18,6 +18,19 @@ mkdir -p /var/www/html/storage/framework/sessions
 mkdir -p /var/www/html/storage/framework/views
 mkdir -p /var/www/html/storage/logs
 
+# Bind-mounted source files may arrive with a remapped host UID/GID that does
+# not match the in-container sail user. Best effort: keep the project tree
+# group/other writable enough for code generators without failing startup.
+if [ -d /var/www/html ]; then
+    chmod o+rx /var/www/html 2>/dev/null || true
+    find /var/www/html \
+        \( -path /var/www/html/vendor -o -path /var/www/html/node_modules \) -prune \
+        -o -type d -writable -exec chmod ug+rwx,o+rx {} + 2>/dev/null || true
+    find /var/www/html \
+        \( -path /var/www/html/vendor -o -path /var/www/html/node_modules \) -prune \
+        -o -type f -writable -exec chmod ug+rw,o+r {} + 2>/dev/null || true
+fi
+
 # Bind-mounted files may be owned by the host with a different numeric UID/GID.
 # Don't make startup fatal on chmod/chgrp attempts for those paths.
 chmod -R ug+rwX "$composer_home" 2>/dev/null || true

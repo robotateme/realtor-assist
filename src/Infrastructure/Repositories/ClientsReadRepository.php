@@ -6,7 +6,7 @@ namespace Infrastructure\Repositories;
 
 use App\Models\Client;
 use Application\Criteria\Persistence\Criteria;
-use Application\Query\Clients\Repositories\ClientsReadRepositoryInterface;
+use Application\Query\Clients\Repositories\DB\ClientsReadRepositoryInterface;
 use Domain\Client\ClientEntity;
 use Domain\Shared\DomainException;
 use Illuminate\Database\Eloquent\Builder;
