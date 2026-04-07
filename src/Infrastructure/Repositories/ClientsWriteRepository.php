@@ -9,10 +9,10 @@ use Application\Command\Repositories\DB\ClientsWriteRepositoryInterface;
 use Application\DTO\ClientDTO;
 use Application\Port\Persistence\OutboxMessageRepositoryInterface;
 use Domain\Client\ClientEntity;
+use Domain\Client\VO\ClientEmail;
 use Domain\Shared\DomainException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
-use Infrastructure\Mappings\Clients\GetClients;
 use Override;
 
 /**
@@ -40,7 +40,13 @@ final readonly class ClientsWriteRepository implements ClientsWriteRepositoryInt
                     'phone' => $clientDTO->phone,
                 ]);
 
-                $entity = new GetClients()->fromModel($client);
+                $entity = ClientEntity::register(
+                    id: $client->id,
+                    fullName: $client->full_name,
+                    email: new ClientEmail($client->email),
+                    phone: $client->phone,
+                    userId: $client->user_id,
+                );
                 $this->outboxMessages?->addAll($entity->domainEvents());
 
                 return $entity;
