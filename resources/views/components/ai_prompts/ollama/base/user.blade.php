@@ -2,7 +2,7 @@
 {current_json}
 
 Сообщение клиента:
-"{{$clentMessage}}"
+"{{$clientMessage}}"
 
 Сделай:
 
