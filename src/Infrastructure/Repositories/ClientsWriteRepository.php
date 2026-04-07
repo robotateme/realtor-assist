@@ -7,9 +7,11 @@ namespace Infrastructure\Repositories;
 use App\Models\Client;
 use Application\Command\Repositories\DB\ClientsWriteRepositoryInterface;
 use Application\DTO\ClientDTO;
+use Application\Port\Persistence\OutboxMessageRepositoryInterface;
 use Domain\Client\ClientEntity;
 use Domain\Shared\DomainException;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\DB;
 use Infrastructure\Mappings\Clients\GetClients;
 use Override;
 
@@ -18,6 +20,11 @@ use Override;
  */
 final readonly class ClientsWriteRepository implements ClientsWriteRepositoryInterface
 {
+    public function __construct(
+        private ?OutboxMessageRepositoryInterface $outboxMessages = null,
+    ) {
+    }
+
     /**
      * @throws DomainException
      */
@@ -25,17 +32,22 @@ final readonly class ClientsWriteRepository implements ClientsWriteRepositoryInt
     public function create(ClientDTO $clientDTO): ClientEntity
     {
         try {
-            $client = Client::query()->create([
-                'user_id' => $clientDTO->userId,
-                'full_name' => $clientDTO->fullName,
-                'email' => $clientDTO->email->getValue(),
-                'phone' => $clientDTO->phone,
-            ]);
+            return DB::transaction(function () use ($clientDTO): ClientEntity {
+                $client = Client::query()->create([
+                    'user_id' => $clientDTO->userId,
+                    'full_name' => $clientDTO->fullName,
+                    'email' => $clientDTO->email->getValue(),
+                    'phone' => $clientDTO->phone,
+                ]);
+
+                $entity = new GetClients()->fromModel($client);
+                $this->outboxMessages?->addAll($entity->domainEvents());
+
+                return $entity;
+            });
         } catch (UniqueConstraintViolationException $exception) {
             throw new DomainException($exception->getMessage(), previous: $exception);
         }
-
-        return new GetClients()->fromModel($client);
     }
 
     /**

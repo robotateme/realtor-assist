@@ -5,10 +5,18 @@ declare(strict_types=1);
 namespace Tests\Unit\App\Providers;
 
 use Application\Command\Repositories\DB\ClientsWriteRepositoryInterface;
+use Application\Port\Bus\EventBusPortInterface;
 use Application\Port\Bus\QueueBusPortInterface;
+use Application\Port\Outbox\EventSerializerInterface;
+use Application\Port\Persistence\OutboxMessageRepositoryInterface;
 use Application\Port\Persistence\RelationsPortInterface;
 use Application\Query\Clients\Repositories\DB\ClientsReadRepositoryInterface;
+use Infrastructure\Bus\LaravelEventBusAdapter;
 use Infrastructure\Bus\LaravelQueueBusAdapter;
+use Infrastructure\Bus\OutboxEventBusAdapter;
+use Infrastructure\Bus\OutboxMessagePublisher;
+use Infrastructure\Outbox\ReflectionEventSerializer;
+use Infrastructure\Persistence\Outbox\EloquentOutboxMessageRepository;
 use Infrastructure\Persistence\Relations\EloquentRelationsAdapterInterface;
 use Infrastructure\Repositories\ClientsReadRepository;
 use Infrastructure\Repositories\ClientsWriteRepository;
@@ -16,6 +24,28 @@ use Tests\TestCase;
 
 final class AppServiceProviderTest extends TestCase
 {
+    public function test_it_binds_event_bus_port_to_laravel_adapter(): void
+    {
+        $service = $this->app->make(EventBusPortInterface::class);
+        $sameService = $this->app->make(EventBusPortInterface::class);
+
+        self::assertInstanceOf(OutboxEventBusAdapter::class, $service);
+        self::assertSame($service, $sameService);
+    }
+
+    public function test_it_binds_outbox_dependencies(): void
+    {
+        $serializer = $this->app->make(EventSerializerInterface::class);
+        $repository = $this->app->make(OutboxMessageRepositoryInterface::class);
+        $publisher = $this->app->make(OutboxMessagePublisher::class);
+        $laravelEventBus = $this->app->make(LaravelEventBusAdapter::class);
+
+        self::assertInstanceOf(ReflectionEventSerializer::class, $serializer);
+        self::assertInstanceOf(EloquentOutboxMessageRepository::class, $repository);
+        self::assertInstanceOf(OutboxMessagePublisher::class, $publisher);
+        self::assertInstanceOf(LaravelEventBusAdapter::class, $laravelEventBus);
+    }
+
     public function test_it_binds_queue_bus_port_to_laravel_adapter(): void
     {
         $service = $this->app->make(QueueBusPortInterface::class);
