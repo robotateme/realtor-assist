@@ -12,7 +12,7 @@ final class MessengerWebhookHandler
 {
     public function handle(MessengerWebhookCommand $command): void
     {
-        Telegraph::chat($command->chatId)->message($this->resolveResponseMessage($command))->send();
+        Telegraph::chat((string) $command->chatId)->message($this->resolveResponseMessage($command))->send();
     }
 
     private function resolveResponseMessage(MessengerWebhookCommand $command): string

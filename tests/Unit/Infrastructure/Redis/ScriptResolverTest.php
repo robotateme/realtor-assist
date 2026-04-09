@@ -28,21 +28,24 @@ final class ScriptResolverTest extends TestCase
         /** @var LuaScript&MockInterface $script */
         $script = Mockery::mock(LuaScript::class);
 
-        $script->shouldReceive('body')->once()->andReturn('return 1');
-        $factory->shouldReceive('connection')->once()->with('cache')->andReturn($connection);
+        /** @var Expectation $scriptBodyExpectation */
+        $scriptBodyExpectation = $script->expects('body');
+        $scriptBodyExpectation->andReturn('return 1');
+
+        /** @var Expectation $connectionExpectation */
+        $connectionExpectation = $factory->expects('connection');
+        $connectionExpectation->with('cache')->andReturn($connection);
 
         /** @var Expectation $evalShaExpectation */
-        $evalShaExpectation = $connection->shouldReceive('evalsha');
+        $evalShaExpectation = $connection->expects('evalsha');
         $evalShaExpectation
-            ->once()
-            ->with('return 1', 1, 'bucket', '42')
+            ->with('return 1', ['bucket', '42'], 1)
             ->andThrow(new RuntimeException('NOSCRIPT No matching script. Please use EVAL.'));
 
         /** @var Expectation $evalExpectation */
-        $evalExpectation = $connection->shouldReceive('eval');
+        $evalExpectation = $connection->expects('eval');
         $evalExpectation
-            ->once()
-            ->with('return 1', 1, 'bucket', '42')
+            ->with('return 1', ['bucket', '42'], 1)
             ->andReturn([1]);
 
         $resolver = new ScriptResolver($factory, 'cache');

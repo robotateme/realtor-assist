@@ -25,16 +25,17 @@ final class ScriptResolver implements ScriptExecutorInterface
         $connection = $this->connection();
         $scriptBody = $script->body();
         $flatArguments = [...$keys, ...$arguments];
+        $numberOfKeys = count($keys);
 
         try {
-            return $connection->evalsha($scriptBody, count($keys), ...$flatArguments);
+            return $connection->evalsha($scriptBody, $flatArguments, $numberOfKeys);
         } catch (Throwable $exception) {
             if (! $this->isMissingScriptException($exception)) {
                 throw $exception;
             }
         }
 
-        return $connection->eval($scriptBody, count($keys), ...$flatArguments);
+        return $connection->eval($scriptBody, $flatArguments, $numberOfKeys);
     }
 
     private function connection(): Connection

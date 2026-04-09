@@ -2,6 +2,13 @@
 
 Laravel 13 project for realtor workflow automation with Telegram webhook integration, Horizon, Telescope, and an Ollama-backed legal assistant flow.
 
+## Quality Status
+
+Verified in Docker on April 9, 2026:
+
+- Tests: `72 passed (228 assertions)` via `docker compose run --rm --no-deps laravel.test php artisan test`
+- PHPStan: `No errors` via `docker compose run --rm --no-deps laravel.test ./vendor/bin/phpstan analyse --memory-limit=1G`
+
 ## Stack
 
 - PHP 8.5

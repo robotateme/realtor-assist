@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Infrastructure\Cache;
 
 use Application\Port\Cache\CacheStoreInterface;
+use Closure;
 use DateInterval;
 use DateTimeInterface;
 use Illuminate\Contracts\Cache\Repository;
@@ -44,16 +45,17 @@ final readonly class LaravelCacheStore implements CacheStoreInterface
     {
         $cacheKey = $this->key($key);
         $resolvedTtl = $this->resolveTtl($ttl);
+        $callback = Closure::fromCallable($resolver);
 
         if ($resolvedTtl !== null) {
-            return $this->repository->remember($cacheKey, $resolvedTtl, $resolver);
+            return $this->repository->remember($cacheKey, $resolvedTtl, $callback);
         }
 
         if ($this->repository->has($cacheKey)) {
             return $this->repository->get($cacheKey);
         }
 
-        $value = $resolver();
+        $value = $callback();
         $this->repository->forever($cacheKey, $value);
 
         return $value;
