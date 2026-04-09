@@ -11,6 +11,36 @@ Laravel 13 project for realtor workflow automation with Telegram webhook integra
 - Redis
 - Docker Compose
 
+## Configuration
+
+Key application settings live in `config/realtor-assist.php`.
+
+Ollama / LLM settings:
+
+- `OLLAMA_BASE_URL`
+- `OLLAMA_API_KEY`
+- `OLLAMA_TIMEOUT`
+- `OLLAMA_CONNECT_TIMEOUT`
+- `OLLAMA_DEFAULT_MODEL`
+- `OLLAMA_MODEL_QWEN`
+- `OLLAMA_MODEL_GPT`
+
+Redis-backed rate limit settings for Ollama chat:
+
+- `REALTOR_ASSIST_REDIS_CONNECTION`
+- `REALTOR_ASSIST_RATE_LIMIT_PREFIX`
+- `OLLAMA_RATE_LIMIT_ENABLED`
+- `OLLAMA_RATE_LIMIT_BUCKET`
+- `OLLAMA_RATE_LIMIT_MAX_ATTEMPTS`
+- `OLLAMA_RATE_LIMIT_WINDOW_SECONDS`
+- `OLLAMA_RATE_LIMIT_COST`
+
+Application cache port settings:
+
+- `REALTOR_ASSIST_CACHE_STORE`
+- `REALTOR_ASSIST_CACHE_PREFIX`
+- `REALTOR_ASSIST_CACHE_TTL`
+
 ## Run
 
 ```bash
@@ -54,10 +84,15 @@ docker compose run --rm laravel.test php artisan migrate:fresh --force
 
 - Main application code lives in `app/` and `src/`.
 - Domain layer lives in `src/Domain`.
+- Application ports live in `src/Application/Port`; infrastructure adapters live in `src/Infrastructure`.
 - Event publishing uses the Outbox pattern.
 - `EventBusPortInterface` writes to `outbox_messages`, and `OutboxMessagePublisher` publishes pending events through Laravel events.
 - Ollama transport lives in `Infrastructure/Http/OllamaHttpClient` and is wired through PSR HTTP interfaces.
+- `OllamaHttpClientInterface` is wrapped by `Infrastructure/Http/RateLimitedOllamaHttpClient`, which applies a Redis sliding-window rate limit for `/api/chat`.
+- Redis coordination for rate limiting goes through `Infrastructure/Redis/ScriptResolver`; Lua scripts are stored in `src/Infrastructure/Redis/Scripts/Lua`.
 - Prompt rendering is isolated in `Infrastructure/Prompt/BladePromptRenderer`.
+- Prompt composition is handled by `Infrastructure/Prompt/CompositePromptResolver`, so the legal-assistant flow can layer base and scenario-specific prompts.
 - Base legal-assistant prompts live in `resources/views/components/ai_prompts/ollama/base`.
-- `Infrastructure/LLM/OllamaLegalAssistantClient` renders the base prompts, sends `/api/chat` requests to Ollama, and decodes the JSON response.
-- Telegram webhook route is provider-driven through Telegraph config.
+- `Infrastructure/LLM/OllamaLegalAssistantClient` resolves prompt layers, maps model aliases from config, sends `/api/chat` requests to Ollama, and decodes the JSON response.
+- Cache access is abstracted behind `Application\Port\Cache\CacheStoreInterface` with the Laravel adapter in `Infrastructure/Cache/LaravelCacheStore`.
+- Telegram webhook route is provider-driven through Telegraph config and exposed as the named route `telegraph.webhook`.
