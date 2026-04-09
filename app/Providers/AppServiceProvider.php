@@ -39,6 +39,7 @@ use Infrastructure\Persistence\Repositories\EloquentFilterContext;
 use Infrastructure\Prompt\BladePromptRenderer;
 use Infrastructure\Prompt\CompositePromptResolver;
 use Infrastructure\RateLimit\RedisRateLimiter;
+use Infrastructure\Redis\ScriptExecutorInterface;
 use Infrastructure\Redis\ScriptResolver;
 use Infrastructure\Redis\Scripts\RateLimitHitScript;
 use Infrastructure\Repositories\ClientsReadRepository;
@@ -73,12 +74,13 @@ final class AppServiceProvider extends ServiceProvider
                 connection: $config['connection'],
             );
         });
+        $this->app->singleton(ScriptExecutorInterface::class, ScriptResolver::class);
         $this->app->singleton(RateLimiterInterface::class, function (): RedisRateLimiter {
             /** @var array{prefix:string} $config */
             $config = config('realtor-assist.rate_limit');
 
             return new RedisRateLimiter(
-                scriptResolver: $this->app->make(ScriptResolver::class),
+                scriptExecutor: $this->app->make(ScriptExecutorInterface::class),
                 script: $this->app->make(RateLimitHitScript::class),
                 prefix: $config['prefix'],
             );

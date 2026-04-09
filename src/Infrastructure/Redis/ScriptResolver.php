@@ -8,7 +8,7 @@ use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
 use Throwable;
 
-final class ScriptResolver
+final class ScriptResolver implements ScriptExecutorInterface
 {
     public function __construct(
         private readonly Factory $redis,

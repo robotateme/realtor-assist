@@ -6,14 +6,14 @@ namespace Infrastructure\RateLimit;
 
 use Application\Port\RateLimit\RateLimiterInterface;
 use Application\Port\RateLimit\RateLimitResult;
-use Infrastructure\Redis\ScriptResolver;
+use Infrastructure\Redis\ScriptExecutorInterface;
 use Infrastructure\Redis\Scripts\RateLimitHitScript;
 use RuntimeException;
 
 final readonly class RedisRateLimiter implements RateLimiterInterface
 {
     public function __construct(
-        private ScriptResolver $scriptResolver,
+        private ScriptExecutorInterface $scriptExecutor,
         private RateLimitHitScript $script,
         private string $prefix = 'rate-limit',
     ) {
@@ -27,7 +27,7 @@ final readonly class RedisRateLimiter implements RateLimiterInterface
     ): RateLimitResult {
         $nowMs = (int) floor(microtime(true) * 1000);
 
-        $result = $this->scriptResolver->execute(
+        $result = $this->scriptExecutor->execute(
             script: $this->script,
             keys: [$this->resolveKey($bucket)],
             arguments: [$nowMs, $windowSeconds * 1000, $maxAttempts, $cost, uniqid('', true)],

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Infrastructure\RateLimit;
 
 use Infrastructure\RateLimit\RedisRateLimiter;
-use Infrastructure\Redis\ScriptResolver;
+use Infrastructure\Redis\ScriptExecutorInterface;
 use Infrastructure\Redis\Scripts\RateLimitHitScript;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -19,12 +19,12 @@ final class RedisRateLimiterTest extends TestCase
 
     public function test_it_maps_lua_response_to_result_object(): void
     {
-        /** @var ScriptResolver&MockInterface $resolver */
-        $resolver = Mockery::mock(ScriptResolver::class);
+        /** @var ScriptExecutorInterface&MockInterface $executor */
+        $executor = Mockery::mock(ScriptExecutorInterface::class);
         $script = new RateLimitHitScript();
 
         /** @var Expectation $expectation */
-        $expectation = $resolver->shouldReceive('execute');
+        $expectation = $executor->shouldReceive('execute');
         $expectation
             ->once()
             ->withArgs(static function (RateLimitHitScript $actualScript, array $keys, array $arguments) use ($script): bool {
@@ -40,7 +40,7 @@ final class RedisRateLimiterTest extends TestCase
             })
             ->andReturn([1, 29, 0, 1710000060, 30, 1]);
 
-        $limiter = new RedisRateLimiter($resolver, $script, 'rl');
+        $limiter = new RedisRateLimiter($executor, $script, 'rl');
 
         $result = $limiter->hit('ollama:chat', 30, 60, 1);
 
