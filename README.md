@@ -41,6 +41,42 @@ Application cache port settings:
 - `REALTOR_ASSIST_CACHE_PREFIX`
 - `REALTOR_ASSIST_CACHE_TTL`
 
+## Cache Strategy
+
+Use the application cache through `Application\Port\Cache\CacheStoreInterface` rather than Laravel facades or direct Redis calls from application code.
+
+Recommended cache key layout:
+
+- `{context}:{shape}:v1`
+- `{context}:{shape}:v1:{id}`
+- `{context}:{shape}:v1:{version}:{query-hash}`
+
+Examples:
+
+- `clients:by-id:v1:123`
+- `clients:list:v1:7f3d2a1c`
+- `clients:list:v1:4:7f3d2a1c`
+- `telegram-bot:token:v1:test-token`
+
+Recommended invalidation rules:
+
+- Entity cache: invalidate directly with `forget()`
+- List/search/query cache: use namespace versioning instead of tracking every possible key
+- Rarely changing reference data: long TTL is usually enough
+
+Practical approach:
+
+- `by-id` cache:
+  - key: `clients:by-id:v1:{id}`
+  - invalidation: `forget()` on create/update/delete of that entity
+- `list/search` cache:
+  - key: `clients:list:v1:{listVersion}:{queryHash}`
+  - invalidation: bump `listVersion` when source data changes
+- derived hot data:
+  - combine short TTL with version bump when strong consistency matters
+
+Use `v1` in keys so cache formats can be rotated safely without manual Redis cleanup.
+
 ## Run
 
 ```bash
