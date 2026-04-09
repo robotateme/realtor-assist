@@ -10,6 +10,7 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
     Route::prefix('webhooks')->group(function () {
-        Route::post('telegram/{token}', TelegramWebhookController::class);
+        Route::post('telegram/{token}', TelegramWebhookController::class)
+            ->name('telegraph.webhook');
     });
 });

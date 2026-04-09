@@ -8,6 +8,9 @@ use Application\Port\Prompt\PromptRendererInterface;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Override;
 
+/**
+ *
+ */
 final readonly class BladePromptRenderer implements PromptRendererInterface
 {
     public function __construct(

@@ -36,6 +36,7 @@ final class OllamaHttpClientTest extends TestCase
                 self::assertSame('http://127.0.0.1:11434/api/generate', (string) $request->getUri());
                 self::assertSame('application/json', $request->getHeaderLine('Accept'));
                 self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+                self::assertSame('Bearer test-key', $request->getHeaderLine('Authorization'));
                 self::assertSame('{"model":"llama3.2","prompt":"Hello"}', (string) $request->getBody());
 
                 return true;
@@ -47,6 +48,7 @@ final class OllamaHttpClientTest extends TestCase
             requestFactory: $httpFactory,
             streamFactory: $httpFactory,
             baseUri: 'http://127.0.0.1:11434',
+            apiKey: 'test-key',
         );
 
         self::assertSame($response, $ollamaClient->postJson('/api/generate', [
@@ -70,6 +72,7 @@ final class OllamaHttpClientTest extends TestCase
             ->withArgs(static function (RequestInterface $request): bool {
                 self::assertSame('POST', $request->getMethod());
                 self::assertSame('http://127.0.0.1:11434/api/chat', (string) $request->getUri());
+                self::assertSame('Bearer test-key', $request->getHeaderLine('Authorization'));
                 self::assertSame(
                     '{"stream":false,"model":"llama3.2","messages":[{"role":"system","content":"You are helpful."},{"role":"user","content":"Hello"}]}',
                     (string) $request->getBody(),
@@ -84,6 +87,7 @@ final class OllamaHttpClientTest extends TestCase
             requestFactory: $httpFactory,
             streamFactory: $httpFactory,
             baseUri: 'http://127.0.0.1:11434',
+            apiKey: 'test-key',
         );
 
         self::assertSame($response, $ollamaClient->chat('llama3.2', [

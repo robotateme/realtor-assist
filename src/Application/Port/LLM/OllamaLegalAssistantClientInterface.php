@@ -8,6 +8,9 @@ interface OllamaLegalAssistantClientInterface
 {
     /**
      * @param array<string, mixed> $currentJson
+     * @param list<string> $systemPromptViews
+     * @param list<string> $userPromptViews
+     * @param array<string, mixed> $promptData
      * @param array<string, mixed> $options
      *
      * @return array<string, mixed>
@@ -16,6 +19,9 @@ interface OllamaLegalAssistantClientInterface
         string $model,
         array $currentJson,
         string $clientMessage,
+        array $systemPromptViews = [],
+        array $userPromptViews = [],
+        array $promptData = [],
         array $options = [],
     ): array;
 }

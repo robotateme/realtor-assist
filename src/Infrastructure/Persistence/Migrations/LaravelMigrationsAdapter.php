@@ -9,6 +9,9 @@ use Closure;
 use Illuminate\Support\Facades\Schema;
 use Override;
 
+/**
+ *
+ */
 final class LaravelMigrationsAdapter implements MigrationsPortInterface
 {
     #[Override]
