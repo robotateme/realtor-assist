@@ -21,6 +21,7 @@ final readonly class OllamaHttpClient implements OllamaHttpClientInterface
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private ?string $apiKey = null,
     ) {
     }
 
@@ -38,6 +39,10 @@ final readonly class OllamaHttpClient implements OllamaHttpClientInterface
 
         foreach ($headers as $name => $value) {
             $request = $request->withHeader($name, $value);
+        }
+
+        if ($this->apiKey !== null && $this->apiKey !== '') {
+            $request = $request->withHeader('Authorization', 'Bearer ' . $this->apiKey);
         }
 
         if ($payload !== []) {

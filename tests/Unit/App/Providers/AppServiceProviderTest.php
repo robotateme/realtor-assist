@@ -12,18 +12,24 @@ use Application\Port\LLM\OllamaLegalAssistantClientInterface;
 use Application\Port\Outbox\EventSerializerInterface;
 use Application\Port\Persistence\OutboxMessageRepositoryInterface;
 use Application\Port\Prompt\PromptRendererInterface;
+use Application\Port\Prompt\PromptResolverInterface;
 use Application\Port\Persistence\RelationsPortInterface;
 use Application\Query\Clients\Repositories\DB\ClientsReadRepositoryInterface;
+use Application\Port\RateLimit\RateLimiterInterface;
 use Infrastructure\Bus\LaravelEventBusAdapter;
 use Infrastructure\Bus\LaravelQueueBusAdapter;
 use Infrastructure\Bus\OutboxEventBusAdapter;
 use Infrastructure\Bus\OutboxMessagePublisher;
 use Infrastructure\Http\OllamaHttpClient;
+use Infrastructure\Http\RateLimitedOllamaHttpClient;
 use Infrastructure\LLM\OllamaLegalAssistantClient;
 use Infrastructure\Outbox\ReflectionEventSerializer;
 use Infrastructure\Persistence\Outbox\EloquentOutboxMessageRepository;
 use Infrastructure\Persistence\Relations\EloquentRelationsAdapterInterface;
 use Infrastructure\Prompt\BladePromptRenderer;
+use Infrastructure\Prompt\CompositePromptResolver;
+use Infrastructure\RateLimit\RedisRateLimiter;
+use Infrastructure\Redis\ScriptResolver;
 use Infrastructure\Repositories\ClientsReadRepository;
 use Infrastructure\Repositories\ClientsWriteRepository;
 use Tests\TestCase;
@@ -46,16 +52,24 @@ final class AppServiceProviderTest extends TestCase
         $publisher = $this->app->make(OutboxMessagePublisher::class);
         $laravelEventBus = $this->app->make(LaravelEventBusAdapter::class);
         $ollamaHttpClient = $this->app->make(OllamaHttpClientInterface::class);
+        $baseOllamaHttpClient = $this->app->make(OllamaHttpClient::class);
         $promptRenderer = $this->app->make(PromptRendererInterface::class);
+        $promptResolver = $this->app->make(PromptResolverInterface::class);
         $ollamaLegalAssistant = $this->app->make(OllamaLegalAssistantClientInterface::class);
+        $rateLimiter = $this->app->make(RateLimiterInterface::class);
+        $scriptResolver = $this->app->make(ScriptResolver::class);
 
         self::assertInstanceOf(ReflectionEventSerializer::class, $serializer);
         self::assertInstanceOf(EloquentOutboxMessageRepository::class, $repository);
         self::assertInstanceOf(OutboxMessagePublisher::class, $publisher);
         self::assertInstanceOf(LaravelEventBusAdapter::class, $laravelEventBus);
-        self::assertInstanceOf(OllamaHttpClient::class, $ollamaHttpClient);
+        self::assertInstanceOf(RateLimitedOllamaHttpClient::class, $ollamaHttpClient);
+        self::assertInstanceOf(OllamaHttpClient::class, $baseOllamaHttpClient);
         self::assertInstanceOf(BladePromptRenderer::class, $promptRenderer);
+        self::assertInstanceOf(CompositePromptResolver::class, $promptResolver);
         self::assertInstanceOf(OllamaLegalAssistantClient::class, $ollamaLegalAssistant);
+        self::assertInstanceOf(RedisRateLimiter::class, $rateLimiter);
+        self::assertInstanceOf(ScriptResolver::class, $scriptResolver);
     }
 
     public function test_it_binds_queue_bus_port_to_laravel_adapter(): void
