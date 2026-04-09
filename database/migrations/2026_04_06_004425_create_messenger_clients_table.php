@@ -13,7 +13,7 @@ return new class extends Migration {
     {
         Schema::create('messenger_clients', static function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Client::class)->constrained();
+            $table->foreignIdFor(Client::class)->nullable()->constrained();
             $table->string('provider');
             $table->string('username');
             $table->string('first_name');

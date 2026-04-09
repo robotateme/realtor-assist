@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use Application\Command\MessengerWebhookCommand;
-use Application\Command\MessengerWebhookHandler;
 use Application\DTO\MessengerClientDTO;
+use Application\Port\Bus\QueueBusPortInterface;
 use DefStudio\Telegraph\DTO\TelegramUpdate;
-use DefStudio\Telegraph\Facades\Telegraph;
 use Domain\MessengerClient\MessengerProviderEnum;
 use Domain\MessengerClient\VO\MessengerId;
 use Domain\Shared\DomainException;
@@ -23,39 +22,47 @@ final class TelegramWebhookController extends Controller
 {
     /**
      * @param Request $request
-     * @param MessengerWebhookHandler $handler
+     * @param QueueBusPortInterface $queueBus
      * @return JsonResponse
      */
-    public function __invoke(Request $request, MessengerWebhookHandler $handler): JsonResponse
+    public function __invoke(Request $request, QueueBusPortInterface $queueBus): JsonResponse
     {
         $requestDto = TelegramUpdate::fromArray($request->all());
+        $message = $requestDto->message();
+
+        if ($message === null || $message->from() === null) {
+            return response()->json(['status' => 'ignored']);
+        }
+
         try {
             $messengerId = new MessengerId(
                 MessengerProviderEnum::TELEGRAM,
-                (string) $requestDto->message()->from()->id(),
+                (string) $message->from()->id(),
             );
         } catch (DomainException $e) {
             throw new RuntimeException($e->getMessage());
         }
 
-        $chatId = $requestDto->message()?->chat()?->id();
+        $chatId = $message->chat()?->id();
         if (is_null($chatId)) {
             $chatId = $requestDto->chatMemberUpdate()?->chat()?->id();
         }
 
         $command = new MessengerWebhookCommand(
             messengerClientDTO: new MessengerClientDTO(
+                username: $message->from()->username(),
                 messengerId: $messengerId->getValue(),
-                firstName: $requestDto->message()->from()->firstName(),
-                lastName: $requestDto->message()->from()->lastName(),
-                isBot: $requestDto->message()->from()->isBot(),
+                firstName: $message->from()->firstName(),
+                lastName: $message->from()->lastName(),
+                isBot: $message->from()->isBot(),
                 clientId: null,
             ),
             chatId: (int) $chatId,
+            messageText: $message->text(),
         );
 
-        Telegraph::chat($chatId)->message('Hello world!')->send();
-        $handler->handle($command);
+        $queueBus->dispatch($command);
+
         return response()->json($chatId);
     }
 }

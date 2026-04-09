@@ -8,6 +8,7 @@ namespace Application\DTO;
 class MessengerClientDTO
 {
     public function __construct(
+        public string $username,
         public string $firstName,
         public string $lastName,
         public bool $isBot,
