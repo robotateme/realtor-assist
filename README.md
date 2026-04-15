@@ -4,9 +4,9 @@ Laravel 13 project for realtor workflow automation with Telegram webhook integra
 
 ## Quality Status
 
-Verified in Docker on April 9, 2026:
+Verified in Docker on April 15, 2026:
 
-- Tests: `72 passed (228 assertions)` via `docker compose run --rm --no-deps laravel.test php artisan test`
+- Tests: `79 passed (240 assertions)` via `docker compose run --rm --no-deps laravel.test php artisan test`
 - PHPStan: `No errors` via `docker compose run --rm --no-deps laravel.test ./vendor/bin/phpstan analyse --memory-limit=1G`
 
 ## Stack
@@ -128,6 +128,9 @@ docker compose run --rm laravel.test php artisan migrate:fresh --force
 - Main application code lives in `app/` and `src/`.
 - Domain layer lives in `src/Domain`.
 - Application ports live in `src/Application/Port`; infrastructure adapters live in `src/Infrastructure`.
+- Service container wiring is split by responsibility:
+  - `App\Providers\RepositoryServiceProvider` registers repositories and persistence adapters.
+  - `App\Providers\IntegrationsServiceProvider` registers bus, cache, HTTP, LLM, rate-limit, and messenger integrations.
 - Event publishing uses the Outbox pattern.
 - `EventBusPortInterface` writes to `outbox_messages`, and `OutboxMessagePublisher` publishes pending events through Laravel events.
 - Ollama transport lives in `Infrastructure/Http/OllamaHttpClient` and is wired through PSR HTTP interfaces.
@@ -139,3 +142,5 @@ docker compose run --rm laravel.test php artisan migrate:fresh --force
 - `Infrastructure/LLM/OllamaLegalAssistantClient` resolves prompt layers, maps model aliases from config, sends `/api/chat` requests to Ollama, and decodes the JSON response.
 - Cache access is abstracted behind `Application\Port\Cache\CacheStoreInterface` with the Laravel adapter in `Infrastructure/Cache/LaravelCacheStore`.
 - Telegram webhook route is provider-driven through Telegraph config and exposed as the named route `telegraph.webhook`.
+- `Application\Command\MessengerWebhookCommand` is a plain application command; Laravel queue transport is applied in `Infrastructure\Bus\LaravelQueueBusAdapter` via `Infrastructure\Bus\Jobs\MessengerWebhookJob`.
+- Telegram message delivery is isolated behind `Application\Port\Messenger\MessengerMessageSenderInterface` with the Telegraph adapter in `Infrastructure\Messenger\TelegramMessageSender`.
