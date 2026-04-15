@@ -4,15 +4,26 @@ declare(strict_types=1);
 
 namespace Application\Command;
 
-use App\Models\MessengerClient;
-use DefStudio\Telegraph\Facades\Telegraph;
+use Application\Command\Repositories\DB\MessengerClientsReadRepositoryInterface;
+use Application\Command\Repositories\DB\MessengerClientsWriteRepositoryInterface;
+use Application\Port\Messenger\MessengerMessageSenderInterface;
 use Domain\MessengerClient\MessengerProviderEnum;
 
-final class MessengerWebhookHandler
+final readonly class MessengerWebhookHandler
 {
+    public function __construct(
+        private MessengerClientsReadRepositoryInterface $messengerClientsReadRepository,
+        private MessengerClientsWriteRepositoryInterface $messengerClientsWriteRepository,
+        private MessengerMessageSenderInterface $messengerMessageSender,
+    ) {
+    }
+
     public function handle(MessengerWebhookCommand $command): void
     {
-        Telegraph::chat((string) $command->chatId)->message($this->resolveResponseMessage($command))->send();
+        $this->messengerMessageSender->send(
+            $command->chatId,
+            $this->resolveResponseMessage($command),
+        );
     }
 
     private function resolveResponseMessage(MessengerWebhookCommand $command): string
@@ -21,25 +32,17 @@ final class MessengerWebhookHandler
             return 'Команда пока не поддерживается.';
         }
 
-        /** @var MessengerClient|null $messengerClient */
-        $messengerClient = MessengerClient::query()
-            ->where('provider', MessengerProviderEnum::TELEGRAM->value)
-            ->where('messenger_id', $command->messengerClientDTO->messengerId)
-            ->first();
-
-        if ($messengerClient !== null) {
+        if ($this->messengerClientsReadRepository->existsByMessengerId(
+            MessengerProviderEnum::TELEGRAM,
+            $command->messengerClientDTO->messengerId,
+        )) {
             return 'Вы уже зарегистрированы.';
         }
 
-        MessengerClient::query()->create([
-            'client_id' => null,
-            'provider' => MessengerProviderEnum::TELEGRAM->value,
-            'username' => $command->messengerClientDTO->username,
-            'first_name' => $command->messengerClientDTO->firstName,
-            'last_name' => $command->messengerClientDTO->lastName,
-            'is_bot' => $command->messengerClientDTO->isBot,
-            'messenger_id' => $command->messengerClientDTO->messengerId,
-        ]);
+        $this->messengerClientsWriteRepository->create(
+            MessengerProviderEnum::TELEGRAM,
+            $command->messengerClientDTO,
+        );
 
         return 'Регистрация в мессенджере завершена.';
     }

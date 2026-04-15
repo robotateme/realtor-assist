@@ -51,10 +51,10 @@ final class TelegramWebhookController extends Controller
         $command = new MessengerWebhookCommand(
             messengerClientDTO: new MessengerClientDTO(
                 username: $message->from()->username(),
-                messengerId: $messengerId->getValue(),
                 firstName: $message->from()->firstName(),
                 lastName: $message->from()->lastName(),
                 isBot: $message->from()->isBot(),
+                messengerId: $messengerId->getValue(),
                 clientId: null,
             ),
             chatId: (int) $chatId,
