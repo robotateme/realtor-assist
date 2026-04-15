@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
 use Override;
 
 /**
@@ -30,7 +29,6 @@ final class Viewing extends Model
 {
     /** @use HasFactory<ViewingFactory> */
     use HasFactory;
-    use InteractsWithRelations;
 
     #[Override]
     protected function casts(): array
@@ -44,12 +42,12 @@ final class Viewing extends Model
     /** @return BelongsTo<Client,$this> */
     public function client(): BelongsTo
     {
-        return $this->relationsPort()->belongsTo($this, Client::class);
+        return $this->belongsTo(Client::class);
     }
 
     /** @return BelongsTo<Property,$this> */
     public function property(): BelongsTo
     {
-        return $this->relationsPort()->belongsTo($this, Property::class);
+        return $this->belongsTo(Property::class);
     }
 }

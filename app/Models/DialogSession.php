@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
 use Override;
 
 /**
@@ -29,7 +28,6 @@ final class DialogSession extends Model
 {
     /** @use HasFactory<DialogSessionFactory> */
     use HasFactory;
-    use InteractsWithRelations;
 
     #[Override]
     protected function casts(): array
@@ -43,6 +41,6 @@ final class DialogSession extends Model
     /** @return BelongsTo<Client,$this> */
     public function client(): BelongsTo
     {
-        return $this->relationsPort()->belongsTo($this, Client::class);
+        return $this->belongsTo(Client::class);
     }
 }

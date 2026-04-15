@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
 
 /**
  * @property int $id
@@ -32,7 +31,6 @@ final class Client extends Model
 {
     /** @use HasFactory<ClientFactory> */
     use HasFactory;
-    use InteractsWithRelations;
 
     protected $fillable = [
         'full_name',
@@ -44,18 +42,18 @@ final class Client extends Model
     /** @return BelongsTo<User,$this> */
     public function user(): BelongsTo
     {
-        return $this->relationsPort()->belongsTo($this, User::class);
+        return $this->belongsTo(User::class);
     }
 
     /** @return HasMany<Viewing,$this> */
     public function viewings(): HasMany
     {
-        return $this->relationsPort()->hasMany($this, Viewing::class);
+        return $this->hasMany(Viewing::class);
     }
 
     /** @return HasOne<DialogSession,$this> */
     public function dialogSession(): HasOne
     {
-        return $this->relationsPort()->hasOne($this, DialogSession::class);
+        return $this->hasOne(DialogSession::class);
     }
 }

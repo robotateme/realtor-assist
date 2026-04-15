@@ -9,6 +9,9 @@ use Application\Command\Repositories\DB\MessengerClientsWriteRepositoryInterface
 use Application\Port\Messenger\MessengerMessageSenderInterface;
 use Domain\MessengerClient\MessengerProviderEnum;
 
+/**
+ *
+ */
 final readonly class MessengerWebhookHandler
 {
     public function __construct(

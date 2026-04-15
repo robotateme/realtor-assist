@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
 use Override;
 
 /**
@@ -31,7 +30,6 @@ final class Property extends Model
 {
     /** @use HasFactory<PropertyFactory> */
     use HasFactory;
-    use InteractsWithRelations;
 
     #[Override]
     protected function casts(): array
@@ -46,6 +44,6 @@ final class Property extends Model
     /** @return HasMany<Viewing,$this> */
     public function viewings(): HasMany
     {
-        return $this->relationsPort()->hasMany($this, Viewing::class);
+        return $this->hasMany(Viewing::class);
     }
 }

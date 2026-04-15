@@ -7,13 +7,9 @@ namespace Tests\Unit\App\Providers;
 use Application\Command\Repositories\DB\ClientsWriteRepositoryInterface;
 use Application\Command\Repositories\DB\MessengerClientsReadRepositoryInterface;
 use Application\Command\Repositories\DB\MessengerClientsWriteRepositoryInterface;
-use Application\Port\Persistence\MigrationsPortInterface;
 use Application\Port\Persistence\OutboxMessageRepositoryInterface;
-use Application\Port\Persistence\RelationsPortInterface;
 use Application\Query\Clients\Repositories\DB\ClientsReadRepositoryInterface;
-use Infrastructure\Persistence\Migrations\LaravelMigrationsAdapter;
 use Infrastructure\Persistence\Outbox\EloquentOutboxMessageRepository;
-use Infrastructure\Persistence\Relations\EloquentRelationsAdapterInterface;
 use Infrastructure\Repositories\ClientsReadRepository;
 use Infrastructure\Repositories\ClientsWriteRepository;
 use Infrastructure\Repositories\MessengerClientsReadRepository;
@@ -27,20 +23,6 @@ final class RepositoryServiceProviderTest extends TestCase
         $service = $this->app->make(OutboxMessageRepositoryInterface::class);
 
         self::assertInstanceOf(EloquentOutboxMessageRepository::class, $service);
-    }
-
-    public function test_it_binds_migrations_port_to_laravel_adapter(): void
-    {
-        $service = $this->app->make(MigrationsPortInterface::class);
-
-        self::assertInstanceOf(LaravelMigrationsAdapter::class, $service);
-    }
-
-    public function test_it_binds_relations_port_to_eloquent_adapter(): void
-    {
-        $service = $this->app->make(RelationsPortInterface::class);
-
-        self::assertInstanceOf(EloquentRelationsAdapterInterface::class, $service);
     }
 
     public function test_it_binds_clients_read_repository_interface(): void

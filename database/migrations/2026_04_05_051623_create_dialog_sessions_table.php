@@ -3,16 +3,17 @@
 declare(strict_types=1);
 
 use App\Models\Client;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Infrastructure\Persistence\Migrations\InfrastructureMigration;
+use Illuminate\Support\Facades\Schema;
 
-return new class extends InfrastructureMigration {
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        $this->schema()->create('dialog_sessions', function (Blueprint $table) {
+        Schema::create('dialog_sessions', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Client::class)->constrained();
             $table->integer('current_intent');
@@ -27,6 +28,6 @@ return new class extends InfrastructureMigration {
      */
     public function down(): void
     {
-        $this->schema()->dropIfExists('dialog_sessions');
+        Schema::dropIfExists('dialog_sessions');
     }
 };

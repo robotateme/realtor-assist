@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Infrastructure\Persistence\Relations\Concerns\InteractsWithRelations;
 use Override;
 
 /**
@@ -35,7 +34,6 @@ final class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory;
     use Notifiable;
-    use InteractsWithRelations;
 
     /**
      * Get the attributes that should be cast.
@@ -54,6 +52,6 @@ final class User extends Authenticatable
     /** @return HasMany<Client,$this> */
     public function clients(): HasMany
     {
-        return $this->relationsPort()->hasMany($this, Client::class);
+        return $this->hasMany(Client::class);
     }
 }

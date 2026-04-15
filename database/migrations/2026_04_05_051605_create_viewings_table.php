@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 use App\Models\Client;
 use App\Models\Property;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Infrastructure\Persistence\Migrations\InfrastructureMigration;
+use Illuminate\Support\Facades\Schema;
 
-return new class extends InfrastructureMigration {
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        $this->schema()->create('viewings', static function (Blueprint $table) {
+        Schema::create('viewings', static function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Client::class)->constrained();
             $table->foreignIdFor(Property::class)->constrained();
@@ -28,6 +29,6 @@ return new class extends InfrastructureMigration {
      */
     public function down(): void
     {
-        $this->schema()->dropIfExists('viewings');
+        Schema::dropIfExists('viewings');
     }
 };
