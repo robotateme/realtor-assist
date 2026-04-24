@@ -8,6 +8,7 @@ use Application\Port\RateLimit\RateLimiterInterface;
 use Application\Port\RateLimit\RateLimitResult;
 use Infrastructure\Redis\ScriptExecutorInterface;
 use Infrastructure\Redis\Scripts\RateLimitHitScript;
+use Override;
 use RuntimeException;
 
 final readonly class RedisRateLimiter implements RateLimiterInterface
@@ -19,6 +20,7 @@ final readonly class RedisRateLimiter implements RateLimiterInterface
     ) {
     }
 
+    #[Override]
     public function hit(
         string $bucket,
         int $maxAttempts,

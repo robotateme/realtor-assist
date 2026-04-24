@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Infrastructure\Redis\Scripts;
 
 use Infrastructure\Redis\LuaScript;
+use Override;
 use RuntimeException;
 
 final class RateLimitHitScript implements LuaScript
 {
+    #[Override]
     public function name(): string
     {
         return 'rate-limit-hit';
     }
 
+    #[Override]
     public function body(): string
     {
         $path = __DIR__ . '/Lua/rate_limit_hit.lua';

@@ -6,6 +6,7 @@ namespace Infrastructure\Redis;
 
 use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Redis\Connections\Connection;
+use Override;
 use Throwable;
 
 final class ScriptResolver implements ScriptExecutorInterface
@@ -20,6 +21,7 @@ final class ScriptResolver implements ScriptExecutorInterface
      * @param list<string> $keys
      * @param list<int|float|string> $arguments
      */
+    #[Override]
     public function execute(LuaScript $script, array $keys = [], array $arguments = []): mixed
     {
         $connection = $this->connection();
