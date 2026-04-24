@@ -1,146 +1,206 @@
 # Realtor Assist
 
-Laravel 13 project for realtor workflow automation with Telegram webhook integration, Horizon, Telescope, and an Ollama-backed legal assistant flow.
+Техническая документация по локальному деплою и разработке.
 
-## Quality Status
+Описание продукта вынесено в отдельный файл: [docs/PROJECT_DESCRIPTION.md](/home/oem/Work/realtor-assist/docs/PROJECT_DESCRIPTION.md).
 
-Verified in Docker on April 15, 2026:
+## Назначение репозитория
 
-- Tests: `79 passed (240 assertions)` via `docker compose run --rm --no-deps laravel.test php artisan test`
-- PHPStan: `No errors` via `docker compose run --rm --no-deps laravel.test ./vendor/bin/phpstan analyse --memory-limit=1G`
+- backend на Laravel 13 / PHP 8.5
+- Docker Compose окружение для локальной разработки
+- PostgreSQL как основная база
+- Redis для очередей и rate limit
+- Horizon для очередей
+- Telescope для отладки
+- Ollama-интеграция для AI-сценариев
 
-## Stack
+## Локальный деплой через Docker
 
-- PHP 8.5
-- Laravel 13
-- PostgreSQL
-- SQLite for tests
-- Redis
+### Требования
+
+- Docker
 - Docker Compose
+- GNU Make
 
-## Configuration
+### Первый запуск
 
-Key application settings live in `config/realtor-assist.php`.
+```bash
+cp .env.example .env
+make init
+```
 
-Ollama / LLM settings:
+Команда `make init` делает:
+
+- сборку и запуск контейнеров
+- `composer install`
+- `npm install --ignore-scripts`
+- генерацию `APP_KEY`
+- запуск миграций
+- production build фронтенда через `npm run build`
+
+### Доступные сервисы
+
+- приложение: `http://localhost`
+- Horizon: `http://localhost/horizon`
+- Telescope: `http://localhost/telescope`
+- PostgreSQL: `localhost:5432`
+- Redis: `localhost:6379`
+- VarDumper server: `localhost:9912`
+
+### Основные команды
+
+```bash
+make up
+make down
+make restart
+make ps
+make logs
+make shell
+make root-shell
+make test
+make stan
+make psalm
+make static
+make analyse
+make pint
+make migrate
+make fresh
+```
+
+### Описание make-команд
+
+- `make init` — полный первый запуск: build, start, `composer install`, `npm install`, `key:generate`, миграции и `npm run build`
+- `make build` — пересобрать docker-образы
+- `make up` — поднять окружение в фоне
+- `make down` — остановить окружение
+- `make restart` — перезапустить окружение
+- `make ps` — показать статус контейнеров
+- `make logs` — смотреть логи контейнеров
+- `make shell` — открыть shell в контейнере `laravel.test`
+- `make root-shell` — открыть root shell в контейнере `laravel.test`
+- `make composer-install` — установить PHP-зависимости внутри контейнера
+- `make npm-install` — установить Node-зависимости внутри контейнера
+- `make key` — сгенерировать `APP_KEY`
+- `make migrate` — применить миграции
+- `make fresh` — пересоздать базу через `migrate:fresh --force`
+- `make seed` — выполнить сиды
+- `make cache-clear` — очистить кэш Laravel через `optimize:clear`
+- `make optimize-clear` — алиас для `make cache-clear`
+- `make test` — запустить тесты внутри контейнера
+- `make stan` — запустить `phpstan` внутри контейнера
+- `make psalm` — запустить `psalm` внутри контейнера
+- `make static` — полный прогон статического анализа: `phpstan` + `psalm`
+- `make analyse` — алиас для `make static`
+- `make pint` — запустить Laravel Pint
+- `make horizon` — вывести URL Horizon
+- `make telescope` — вывести URL Telescope
+
+Команды, использующие `docker compose exec`, требуют уже поднятый сервис `laravel.test`. Если окружение ещё не запущено, сначала выполни `make up` или `make init`.
+
+## Переменные окружения для Docker
+
+`.env.example` настроен именно под Docker Compose.
+
+Ключевые значения:
+
+- `DB_HOST=pgsql`
+- `DB_USERNAME=sail`
+- `DB_PASSWORD=password`
+- `REDIS_HOST=redis`
+- `QUEUE_CONNECTION=redis`
+
+AI и Telegram:
 
 - `OLLAMA_BASE_URL`
 - `OLLAMA_API_KEY`
-- `OLLAMA_TIMEOUT`
-- `OLLAMA_CONNECT_TIMEOUT`
 - `OLLAMA_DEFAULT_MODEL`
-- `OLLAMA_MODEL_QWEN`
-- `OLLAMA_MODEL_GPT`
+- `TELEGRAM_WEBHOOK_DOMAIN`
+- `TELEGRAM_WEBHOOK_URL`
+- `TELEGRAM_BOT_API_KEY`
 
-Redis-backed rate limit settings for Ollama chat:
+## Локальная разработка без Docker
 
-- `REALTOR_ASSIST_REDIS_CONNECTION`
-- `REALTOR_ASSIST_RATE_LIMIT_PREFIX`
-- `OLLAMA_RATE_LIMIT_ENABLED`
-- `OLLAMA_RATE_LIMIT_BUCKET`
-- `OLLAMA_RATE_LIMIT_MAX_ATTEMPTS`
-- `OLLAMA_RATE_LIMIT_WINDOW_SECONDS`
-- `OLLAMA_RATE_LIMIT_COST`
+Если запускать проект вне контейнеров, нужно вручную адаптировать `.env` минимум по этим полям:
 
-Application cache port settings:
+- `DB_HOST`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `REDIS_HOST`
 
-- `REALTOR_ASSIST_CACHE_STORE`
-- `REALTOR_ASSIST_CACHE_PREFIX`
-- `REALTOR_ASSIST_CACHE_TTL`
-
-## Cache Strategy
-
-Use the application cache through `Application\Port\Cache\CacheStoreInterface` rather than Laravel facades or direct Redis calls from application code.
-
-Recommended cache key layout:
-
-- `{context}:{shape}:v1`
-- `{context}:{shape}:v1:{id}`
-- `{context}:{shape}:v1:{version}:{query-hash}`
-
-Examples:
-
-- `clients:by-id:v1:123`
-- `clients:list:v1:7f3d2a1c`
-- `clients:list:v1:4:7f3d2a1c`
-- `telegram-bot:token:v1:test-token`
-
-Recommended invalidation rules:
-
-- Entity cache: invalidate directly with `forget()`
-- List/search/query cache: use namespace versioning instead of tracking every possible key
-- Rarely changing reference data: long TTL is usually enough
-
-Practical approach:
-
-- `by-id` cache:
-  - key: `clients:by-id:v1:{id}`
-  - invalidation: `forget()` on create/update/delete of that entity
-- `list/search` cache:
-  - key: `clients:list:v1:{listVersion}:{queryHash}`
-  - invalidation: bump `listVersion` when source data changes
-- derived hot data:
-  - combine short TTL with version bump when strong consistency matters
-
-Use `v1` in keys so cache formats can be rotated safely without manual Redis cleanup.
-
-## Run
+Минимальный сценарий:
 
 ```bash
-docker compose up -d
-docker compose run --rm laravel.test composer install
-docker compose run --rm laravel.test php artisan key:generate
-docker compose run --rm laravel.test php artisan migrate:fresh --force
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --force
+npm install
+npm run build
+php artisan serve
+php artisan horizon
 ```
 
-App container service: `laravel.test`
+## Проверки и тесты
 
-## Useful Commands
+Актуальный статус на 24 апреля 2026:
 
-Run tests:
+- `php8.5 ./vendor/bin/phpstan analyse --memory-limit=1G` — `No errors`
+- `php8.5 ./vendor/bin/psalm --no-progress` — `No errors`
+- `docker compose run --rm --no-deps laravel.test php artisan test` — `78 passed`, `240 assertions`
+- `php8.5 artisan test` на хосте — `74 passed`, `4 skipped`, `215 assertions`
+
+Причина пропущенных feature-тестов: в текущем локальном PHP runtime недоступен `pdo_sqlite`, поэтому были пропущены:
+
+- `Tests\Feature\OutboxFlowTest`
+- `Tests\Feature\TelegramWebhookControllerTest`
+
+Тесты:
 
 ```bash
 docker compose run --rm --no-deps laravel.test php artisan test
 ```
 
-The test environment is configured via `.env.testing` and `phpunit.xml` to use `database/testing.sqlite`.
-
-Run PHPStan:
+Локальный запуск на хосте:
 
 ```bash
-docker compose run --rm --no-deps laravel.test ./vendor/bin/phpstan analyse --memory-limit=1G
+php8.5 artisan test
 ```
 
-Run Psalm:
+Статический анализ:
 
 ```bash
-docker compose run --rm --no-deps laravel.test ./vendor/bin/psalm --no-progress
+make static
 ```
 
-Rebuild database:
+По отдельности:
 
 ```bash
-docker compose run --rm laravel.test php artisan migrate:fresh --force
+php8.5 ./vendor/bin/phpstan analyse --memory-limit=1G
+php8.5 ./vendor/bin/psalm --no-progress
 ```
 
-## Notes
+Форматирование:
 
-- Main application code lives in `app/` and `src/`.
-- Domain layer lives in `src/Domain`.
-- Application ports live in `src/Application/Port`; infrastructure adapters live in `src/Infrastructure`.
-- Service container wiring is split by responsibility:
-  - `App\Providers\RepositoryServiceProvider` registers repositories and persistence adapters.
-  - `App\Providers\IntegrationsServiceProvider` registers bus, cache, HTTP, LLM, rate-limit, and messenger integrations.
-- Event publishing uses the Outbox pattern.
-- `EventBusPortInterface` writes to `outbox_messages`, and `OutboxMessagePublisher` publishes pending events through Laravel events.
-- Ollama transport lives in `Infrastructure/Http/OllamaHttpClient` and is wired through PSR HTTP interfaces.
-- `OllamaHttpClientInterface` is wrapped by `Infrastructure/Http/RateLimitedOllamaHttpClient`, which applies a Redis sliding-window rate limit for `/api/chat`.
-- Redis coordination for rate limiting goes through `Infrastructure/Redis/ScriptResolver`; Lua scripts are stored in `src/Infrastructure/Redis/Scripts/Lua`.
-- Prompt rendering is isolated in `Infrastructure/Prompt/BladePromptRenderer`.
-- Prompt composition is handled by `Infrastructure/Prompt/CompositePromptResolver`, so the legal-assistant flow can layer base and scenario-specific prompts.
-- Base legal-assistant prompts live in `resources/views/components/ai_prompts/ollama/base`.
-- `Infrastructure/LLM/OllamaLegalAssistantClient` resolves prompt layers, maps model aliases from config, sends `/api/chat` requests to Ollama, and decodes the JSON response.
-- Cache access is abstracted behind `Application\Port\Cache\CacheStoreInterface` with the Laravel adapter in `Infrastructure/Cache/LaravelCacheStore`.
-- Telegram webhook route is provider-driven through Telegraph config and exposed as the named route `telegraph.webhook`.
-- `Application\Command\MessengerWebhookCommand` is a plain application command; Laravel queue transport is applied in `Infrastructure\Bus\LaravelQueueBusAdapter` via `Infrastructure\Bus\Jobs\MessengerWebhookJob`.
-- Telegram message delivery is isolated behind `Application\Port\Messenger\MessengerMessageSenderInterface` with the Telegraph adapter in `Infrastructure\Messenger\TelegramMessageSender`.
+```bash
+make pint
+```
+
+## Структура проекта
+
+```text
+app/                 Laravel controllers, providers, models
+config/              Конфигурация приложения
+database/            Миграции, фабрики, сидеры
+docker/              Docker runtime и build-файлы
+resources/           Blade и prompt templates
+routes/              Web/API routes
+src/Application      Команды, DTO, порты
+src/Domain           Доменная модель
+src/Infrastructure   Интеграции и адаптеры
+tests/               Feature и unit tests
+```
+
+## Замечания по среде
+
+- `docker compose run ...` может ломаться, если локально используется старый собранный образ Sail. В таком случае пересобери окружение: `docker compose build --no-cache && docker compose up -d`.
+- Основной рабочий путь для проекта сейчас рассчитан на `make` + `docker compose exec`.
